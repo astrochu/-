@@ -118,8 +118,8 @@ void printBlackMoves(int chess[bS][bS]) {
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
             if (chess[i][j] == 1) {
-                if (pM(i, j) == 0) {
-                }
+                pM(i, j) == 0;
+
             }
         }
     }
@@ -133,8 +133,7 @@ void printWhiteMoves(int chess[bS][bS]) {
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
             if (chess[i][j] == 2) {
-                if (pM(i, j) == 0) {
-                }
+                pM(i, j) == 0;
             }
         }
     }
