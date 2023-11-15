@@ -119,7 +119,6 @@ void printBlackMoves(int chess[bS][bS]) {
         for (int j = 0; j < bS; j++) {
             if (chess[i][j] == 1) {
                 if (pM(i, j) == 0) {
-                    printf("(%d,%d) ", i, j);
                 }
             }
         }
@@ -130,13 +129,11 @@ void printBlackMoves(int chess[bS][bS]) {
 // 印出棋盤中可以下白子的位置
 void printWhiteMoves(int chess[bS][bS]) {
     printf("白棋可下位置: ");
-    int hasMoves = 0;  // 標記是否有可下的位置
 
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
             if (chess[i][j] == 2) {
                 if (pM(i, j) == 0) {
-                    printf("(%d,%d) ", i, j);
                 }
             }
         }
