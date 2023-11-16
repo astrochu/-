@@ -1,6 +1,7 @@
 #include <stdio.h>
 #define bS 8 //boardSize
 
+
 //棋盤
 int chess[bS][bS] = {
     {0, 0, 0, 0, 0, 0, 0, 0},
@@ -74,14 +75,34 @@ void Move() {
     do { // 輸入位置，檢查是否有效
         printf("請輸入下棋位置 (格式：行,列)：");
         scanf("%d,%d", &i, &j);
+        int key = 0;
 
-        if (i < 0 || i >= bS || j < 0 || j >= bS || chess[i][j] != 0) {
-            printf("無效位置\n");
-        } else {
-            chess[i][j] = pC;
-            break;
+        for (int p = 0; p < 8; p++) {
+            int x = i + dx[p];
+            int y = j + dy[p];
+
+            while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+                if (chess[x][y] == 0) { //遇到空白，跳出迴圈，接續檢查下個方向
+                    break;
+                } else if (chess[x][y] == pC) { //遇到同色，跳出迴圈，接續檢查下個方向
+                    break;
+                } else { //遇到異色，繼續檢查下一格，尋找空位
+                    x += dx[p];
+                    y += dy[p];
+                    if (x >= 0 && x <= 7 && y >= 0 && y <= 7 && chess[x][y] == 1) {
+                        chess[i][j] = 1;
+                        key = 1;
+                    } else {
+                        key = 0;
+                    }
+                }
+            }
         }
-
+        if (key == 1) {
+            break;
+        } else {
+            printf("無效位置\n");
+        }
     } while (1);
 
     for (int p = 0; p < 8; p++) {
