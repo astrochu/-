@@ -1,8 +1,6 @@
 #include <stdio.h>
 #define bS 8 //boardSize
 
-
-//棋盤
 int chess[bS][bS] = {
     {0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0},
@@ -14,7 +12,8 @@ int chess[bS][bS] = {
     {0, 0, 0, 0, 0, 0, 0, 0}
 };
 
-// 印出棋盤
+
+//印出當前棋盤
 void printChessboard(int chess[bS][bS]) {
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
@@ -30,7 +29,8 @@ void printChessboard(int chess[bS][bS]) {
     }
 }
 
-//8個方向的移動
+
+//八個方向
 int dx[] = {1, -1, 0, 0, 1, -1, 1, -1};
 int dy[] = {0, 0, 1, -1, 1, -1, -1, 1};
 
@@ -67,72 +67,125 @@ int pM(int i, int j) {
     }
 }
 
-// 玩家下棋(黑色)
+void updateBoard(int i, int j, int pC) {
+    for (int p = 0; p < 8; p++) {
+        int x = i + dx[p];
+        int y = j + dy[p];
+
+        while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+            if (chess[x][y] == 0) {
+                break;
+            } else if (chess[x][y] == pC) { // 找到相同顏色的棋子，進行更新
+                while (x != i || y != j) {
+                    x -= dx[p];
+                    y -= dy[p];
+                    chess[x][y] = pC;
+                }
+                break;
+            } else {
+                x += dx[p];
+                y += dy[p];
+            }
+        }
+    }
+}
+
+//玩家移動(黑棋)
 void Move() {
     int pC = 1;
     int i, j;
 
-    do { // 輸入位置，檢查是否有效
+    do {
         printf("請輸入下棋位置 (格式：行,列)：");
         scanf("%d,%d", &i, &j);
+
         int key = 0;
+        int count = 0;
 
         for (int p = 0; p < 8; p++) {
             int x = i + dx[p];
             int y = j + dy[p];
 
             while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-                if (chess[x][y] == 0) { //遇到空白，跳出迴圈，接續檢查下個方向
+                if (chess[x][y] == 0) {
                     break;
-                } else if (chess[x][y] == pC) { //遇到同色，跳出迴圈，接續檢查下個方向
+                } else if (chess[x][y] == pC) {
+                    key = 1;
                     break;
-                } else { //遇到異色，繼續檢查下一格，尋找空位
+                } else {
+                    count ++;
                     x += dx[p];
                     y += dy[p];
-                    if (x >= 0 && x <= 7 && y >= 0 && y <= 7 && chess[x][y] == 1) {
-                        chess[i][j] = 1;
-                        key = 1;
-                    } else {
-                        key = 0;
-                    }
                 }
             }
+
+            if (key) {
+                break;
+            }
         }
-        if (key == 1) {
+
+        if (key) {
+            updateBoard(i, j, pC);
+            printf("黑棋下(%d, %d),翻了 %d 顆白棋\n", i, j, count);
             break;
         } else {
             printf("無效位置\n");
         }
     } while (1);
+}
+
+int evaluateMove(int i, int j, int pC) {
+    int count = 0;
 
     for (int p = 0; p < 8; p++) {
         int x = i + dx[p];
         int y = j + dy[p];
+        int tempCount = 0;
 
         while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-            if (chess[x][y] == 0) { //遇到空白，跳出迴圈，接續檢查下個方向
+            if (chess[x][y] == 0) {
                 break;
-            } else if (chess[x][y] == pC) { //遇到同色，跳出迴圈，接續檢查下個方向
+            } else if (chess[x][y] == pC) {
+                count += tempCount;
                 break;
             } else {
-                chess[x][y] = pC;  // 遇到對手的顏色，將其變成自己的顏色
-
-                x += dx[p]; // 繼續檢查下一格，找到同色停止
+                x += dx[p];
                 y += dy[p];
+                tempCount++;
+            }
+        }
+    }
 
-                if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-                    if (chess[x][y] == pC) {
-                        break;
-                    }
+    return count;
+}
+
+void aiMove() {
+    int pC = 2;
+    int bestMoveI = -1;
+    int bestMoveJ = -1;
+    int maxColorChanges = 0;
+
+    for (int i = 0; i < bS; i++) {
+        for (int j = 0; j < bS; j++) {
+            if (chess[i][j] == 0) {
+                int colorChanges = evaluateMove(i, j, pC);
+                if (colorChanges > maxColorChanges) {
+                    maxColorChanges = colorChanges;
+                    bestMoveI = i;
+                    bestMoveJ = j;
                 }
             }
         }
     }
-    printf("\n");
+
+    if (bestMoveI != -1 && bestMoveJ != -1) {
+        updateBoard(bestMoveI, bestMoveJ, pC);
+        printf("白棋下(%d, %d),翻了 %d 顆黑棋\n",bestMoveI, bestMoveJ, maxColorChanges);
+    } else {
+        printf("沒有位置可以下棋了");
+    }
 }
 
-
-// 印出棋盤中可以下黑子的位置
 void printBlackMoves(int chess[bS][bS]) {
     printf("黑棋可下位置: ");
 
@@ -140,16 +193,15 @@ void printBlackMoves(int chess[bS][bS]) {
         for (int j = 0; j < bS; j++) {
             if (chess[i][j] == 1) {
                 pM(i, j);
-
             }
         }
     }
     printf("\n");
 }
 
-// 印出棋盤中可以下白子的位置
 void printWhiteMoves(int chess[bS][bS]) {
     printf("白棋可下位置: ");
+    int count = 0;
 
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
@@ -161,14 +213,17 @@ void printWhiteMoves(int chess[bS][bS]) {
     printf("\n");
 }
 
-
-// 主程式
 int main() {
     int i, j;
-    for (int round = 1; ; round ++) {
-        printBlackMoves(chess);
+
+    while (1) {
         printChessboard(chess);
+        printBlackMoves(chess);
         Move();
         printChessboard(chess);
+        printWhiteMoves(chess);
+        aiMove();
     }
+
+    return 0;
 }
