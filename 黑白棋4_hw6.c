@@ -216,12 +216,15 @@ void printWhiteMoves(int chess[bS][bS]) {
 
 //期局檢查
 void checkCB(int chess[bS][bS]) {
+    int emptyCount = 0;
     int blackCount = 0;
     int whiteCount = 0;
 
     for (int i = 0; i < bS; i++) {
         for (int j = 0; j < bS; j++) {
-            if (chess[i][j] == 1) {
+            if (chess[i][j] == 0) {
+                emptyCount++;
+            } else if (chess[i][j] == 1) {
                 blackCount++;
             } else if (chess[i][j] == 2) {
                 whiteCount++;
@@ -229,7 +232,7 @@ void checkCB(int chess[bS][bS]) {
         }
     }
 
-    if (blackCount == 0 && whiteCount == 0) {
+    if (emptyCount == 0) {
         if (blackCount > whiteCount) {
             printf("黑棋勝利！\n");
         } else if (blackCount < whiteCount) {
@@ -237,8 +240,10 @@ void checkCB(int chess[bS][bS]) {
         } else {
             printf("平局！\n");
         }
+        exit(0);  // 結束程式
     }
 }
+
 
 int main() {
     int i, j;
