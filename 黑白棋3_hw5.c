@@ -100,33 +100,33 @@ void Move() {
         scanf("%d,%d", &i, &j);
 
         int key = 0;
-        int count = 0;
+        int colorChanges = 0;
 
         for (int p = 0; p < 8; p++) {
             int x = i + dx[p];
             int y = j + dy[p];
+            int changesInThisDirection = 0;
 
             while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
                 if (chess[x][y] == 0) {
                     break;
                 } else if (chess[x][y] == pC) {
-                    key = 1;
+                    if (changesInThisDirection > 0) {
+                        colorChanges += changesInThisDirection;
+                        key = 1;
+                    }
                     break;
                 } else {
-                    count ++;
+                    changesInThisDirection++;
                     x += dx[p];
                     y += dy[p];
                 }
-            }
-
-            if (key) {
-                break;
             }
         }
 
         if (key) {
             updateBoard(i, j, pC);
-            printf("黑棋下(%d, %d),翻了 %d 顆白棋\n", i, j, count);
+            printf("黑棋下(%d, %d),翻了 %d 顆白棋\n", i, j, colorChanges);
             break;
         } else {
             printf("無效位置\n");
@@ -227,3 +227,4 @@ int main() {
 
     return 0;
 }
+
